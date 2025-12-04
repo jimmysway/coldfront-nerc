@@ -1,0 +1,280 @@
+#chartjs-tooltip {
+  background: rgba(255, 255, 255, 0.95);
+  border-radius: 6px;
+  color: #666;
+  opacity: 1;
+  padding: 10px;
+  pointer-events: none;
+  position: absolute;
+  transform: translate(-50%, 0);
+  transition: all .1s ease;
+  box-shadow: 0px 2px 6px 3px rgba(0,0,0,0.05);
+  font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+  font-size: 12px;
+  z-index: 100;
+  width: auto;
+  max-width: none;
+}
+
+#chartjs-tooltip table {
+  margin: 0;
+  width: auto;
+}
+
+#chartjs-tooltip th {
+  border-width: 0;
+  text-align: left;
+  padding: 10px 10px 5px 10px;
+  color: #333;
+  font-size: 13px;
+}
+
+#chartjs-tooltip td {
+  border-width: 0;
+  padding: 5px 10px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  white-space: nowrap;
+}
+
+#chartjs-tooltip .tooltip-row {
+  background-color: inherit;
+  border-width: 0;
+}
+
+#chartjs-tooltip .tooltip-left {
+  display: flex;
+  align-items: center;
+  margin-right: 25px;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+#chartjs-tooltip .tooltip-box {
+  border-width: 0px;
+  display: inline-block;
+  height: 12px;
+  width: 12px;
+  margin-right: 8px;
+  border-radius: 0px;
+}
+
+#chartjs-tooltip .tooltip-label {
+  color: #999;
+  font-weight: normal;
+  white-space: nowrap;
+}
+
+#chartjs-tooltip .tooltip-value {
+  font-weight: 600;
+  color: #444;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+#chartjs-tooltip .tooltip-total-row {
+  margin-top: 10px;
+  padding-top: 5px;
+}
+
+#chartjs-tooltip .tooltip-total-row td {
+  padding-top: 8px;
+  margin-top: 5px;
+}
+
+#chartjs-tooltip .tooltip-total-label {
+  font-weight: 600;
+  color: #333;
+  white-space: nowrap;
+}
+
+#chartjs-tooltip .tooltip-total-value {
+  font-weight: 700;
+  color: #000;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+#chartjs-tooltip .tooltip-error-row {
+  opacity: 0.7;
+}
+
+#chartjs-tooltip .tooltip-error-label {
+  color: #999;
+  font-style: italic;
+}
+
+#chartjs-tooltip .tooltip-error-message {
+  font-weight: 600;
+  color: #d32f2f;
+  white-space: nowrap;
+  flex-shrink: 0;
+  font-size: 11px;
+}
+
+#chartjs-tooltip .tooltip-error-info-row {
+  margin-top: 8px;
+  padding-top: 8px;
+}
+
+#chartjs-tooltip .tooltip-error-info-row td {
+  padding-top: 8px;
+  border-top: 1px solid #ffebee;
+}
+
+#chartjs-tooltip .tooltip-error-info {
+  font-size: 11px;
+  color: #d32f2f;
+  font-style: italic;
+  line-height: 1.4;
+}
+
+#chartjs-tooltip .tooltip-total-value-interpolated {
+  color: #666;
+  font-style: italic;
+}
+
+/* ========================================
+   RESPONSIVE TOOLTIP BREAKPOINTS
+   ======================================== */
+
+/* Medium screens (tablets) */
+@media (max-width: 768px) {
+  #chartjs-tooltip {
+    padding: 8px;
+    font-size: 11px;
+    border-radius: 5px;
+  }
+
+  #chartjs-tooltip th {
+    padding: 8px 8px 4px 8px;
+    font-size: 12px;
+  }
+
+  #chartjs-tooltip td {
+    padding: 4px 8px;
+  }
+
+  #chartjs-tooltip .tooltip-left {
+    margin-right: 18px;
+  }
+
+  #chartjs-tooltip .tooltip-box {
+    height: 10px;
+    width: 10px;
+    margin-right: 6px;
+  }
+
+  #chartjs-tooltip .tooltip-total-row {
+    margin-top: 8px;
+    padding-top: 4px;
+  }
+
+  #chartjs-tooltip .tooltip-total-row td {
+    padding-top: 6px;
+    margin-top: 4px;
+  }
+
+  #chartjs-tooltip .tooltip-error-message,
+  #chartjs-tooltip .tooltip-error-info {
+    font-size: 10px;
+  }
+}
+
+/* Small screens (large phones) */
+@media (max-width: 576px) {
+  #chartjs-tooltip {
+    padding: 6px;
+    font-size: 10px;
+    border-radius: 4px;
+  }
+
+  #chartjs-tooltip th {
+    padding: 6px 6px 3px 6px;
+    font-size: 11px;
+  }
+
+  #chartjs-tooltip td {
+    padding: 3px 6px;
+  }
+
+  #chartjs-tooltip .tooltip-left {
+    margin-right: 12px;
+  }
+
+  #chartjs-tooltip .tooltip-box {
+    height: 8px;
+    width: 8px;
+    margin-right: 5px;
+  }
+
+  #chartjs-tooltip .tooltip-total-row {
+    margin-top: 6px;
+    padding-top: 3px;
+  }
+
+  #chartjs-tooltip .tooltip-total-row td {
+    padding-top: 5px;
+    margin-top: 3px;
+  }
+
+  #chartjs-tooltip .tooltip-error-message,
+  #chartjs-tooltip .tooltip-error-info {
+    font-size: 9px;
+  }
+
+  #chartjs-tooltip .tooltip-error-info-row {
+    margin-top: 6px;
+    padding-top: 6px;
+  }
+}
+
+/* Extra small screens (small phones) */
+@media (max-width: 400px) {
+  #chartjs-tooltip {
+    padding: 5px;
+    font-size: 9px;
+    border-radius: 4px;
+  }
+
+  #chartjs-tooltip th {
+    padding: 5px 5px 2px 5px;
+    font-size: 10px;
+  }
+
+  #chartjs-tooltip td {
+    padding: 2px 5px;
+  }
+
+  #chartjs-tooltip .tooltip-left {
+    margin-right: 10px;
+  }
+
+  #chartjs-tooltip .tooltip-box {
+    height: 7px;
+    width: 7px;
+    margin-right: 4px;
+  }
+
+  #chartjs-tooltip .tooltip-total-row {
+    margin-top: 5px;
+    padding-top: 2px;
+  }
+
+  #chartjs-tooltip .tooltip-total-row td {
+    padding-top: 4px;
+    margin-top: 2px;
+  }
+
+  #chartjs-tooltip .tooltip-error-message,
+  #chartjs-tooltip .tooltip-error-info {
+    font-size: 8px;
+  }
+
+  #chartjs-tooltip .tooltip-error-info-row {
+    margin-top: 5px;
+    padding-top: 5px;
+  }
+}
+

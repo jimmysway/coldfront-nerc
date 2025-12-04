@@ -1,0 +1,137 @@
+/**
+ * Chart Variables - Central CSS custom properties
+ * All chart-related colors, spacing, and typography are defined here
+ */
+
+:root {
+  /* ========================================
+     COLOR PALETTE
+     ======================================== */
+  
+  /* Primary UI Colors */
+  --chart-bg-primary: #ffffff;
+  --chart-bg-secondary: #f0f0f0;
+  --chart-bg-hover: #e0e0e0;
+  --chart-bg-active: #ffffff;
+  
+  /* Text Colors */
+  --chart-text-primary: #333333;
+  --chart-text-secondary: #666666;
+  --chart-text-muted: #888888;
+  --chart-text-light: #999999;
+  
+  /* Dataset Colors - Default palette for chart series */
+  --chart-color-cpu: rgb(0, 192, 232);
+  --chart-color-cpu-bg: rgba(0, 192, 232, 0.1);
+  
+  --chart-color-gpu-h100: rgb(117, 213, 92);
+  --chart-color-gpu-h100-bg: rgba(117, 213, 92, 0.1);
+  
+  --chart-color-gpu-v100: rgb(255, 146, 138);
+  --chart-color-gpu-v100-bg: rgba(255, 146, 138, 0.1);
+  
+  /* Status/Feedback Colors */
+  --chart-color-error: #d32f2f;
+  --chart-color-error-light: #ffebee;
+  --chart-color-success: #539642;
+  --chart-color-success-hover: #2a5c1d;
+  
+  /* Missing Data Indicator */
+  --chart-color-missing-segment: rgba(70, 70, 70, 0.7);
+  --chart-color-missing-gradient: rgb(160, 160, 160);
+  
+  /* ========================================
+     SHADOWS
+     ======================================== */
+  --chart-shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.1);
+  --chart-shadow-md: 0 2px 6px 3px rgba(0, 0, 0, 0.05);
+  
+  /* ========================================
+     SPACING
+     ======================================== */
+  --chart-spacing-xs: 2px;
+  --chart-spacing-sm: 4px;
+  --chart-spacing-md: 8px;
+  --chart-spacing-lg: 14px;
+  --chart-spacing-xl: 20px;
+  
+  /* ========================================
+     BORDER RADIUS
+     ======================================== */
+  --chart-radius-sm: 4px;
+  --chart-radius-md: 6px;
+  --chart-radius-lg: 8px;
+  
+  /* ========================================
+     TYPOGRAPHY
+     ======================================== */
+  --chart-font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+  
+  /* Font sizes - Desktop */
+  --chart-font-size-xs: 10px;
+  --chart-font-size-sm: 11px;
+  --chart-font-size-md: 12px;
+  --chart-font-size-lg: 13px;
+  
+  /* Font weights */
+  --chart-font-weight-normal: 400;
+  --chart-font-weight-semibold: 600;
+  --chart-font-weight-bold: 700;
+  
+  /* ========================================
+     TRANSITIONS
+     ======================================== */
+  --chart-transition-fast: 0.1s ease;
+  --chart-transition-normal: 0.2s ease;
+  
+  /* ========================================
+     Z-INDEX SCALE
+     ======================================== */
+  --chart-z-tooltip: 100;
+  
+  /* ========================================
+     CHART-SPECIFIC
+     ======================================== */
+  
+  /* Gradient fill opacity */
+  --chart-fill-opacity-start: 0.13;
+  --chart-fill-opacity-missing: 0.08;
+  
+  /* Chart dimensions */
+  --chart-height-desktop: 600px;
+  --chart-height-tablet: 550px;
+  --chart-height-mobile: 400px;
+  --chart-height-mobile-sm: 420px;
+}
+
+/* ========================================
+   RESPONSIVE VARIABLE OVERRIDES
+   ======================================== */
+
+@media (max-width: 768px) {
+  :root {
+    --chart-font-size-xs: 9px;
+    --chart-font-size-sm: 10px;
+    --chart-font-size-md: 11px;
+    --chart-font-size-lg: 12px;
+  }
+}
+
+@media (max-width: 576px) {
+  :root {
+    --chart-font-size-xs: 8px;
+    --chart-font-size-sm: 9px;
+    --chart-font-size-md: 10px;
+    --chart-font-size-lg: 11px;
+  }
+}
+
+@media (max-width: 400px) {
+  :root {
+    --chart-font-size-xs: 7px;
+    --chart-font-size-sm: 8px;
+    --chart-font-size-md: 9px;
+    --chart-font-size-lg: 10px;
+  }
+}
+
