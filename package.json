@@ -1,0 +1,25 @@
+{
+    "name": "coldfront-nerc",
+    "version": "1.0.0",
+    "description": "- Packages [ubccr/coldfront](https://github.com/ubccr/coldfront) and the [nerc-project/coldfront-plugin-cloud](https://github.com/nerc-project/coldfront-plugin-cloud) using containers - Stores the kubernetes base manifests for deployment",
+    "main": "index.js",
+    "directories": {
+        "doc": "docs",
+        "test": "src/tests"
+    },
+    "scripts": {
+        "test": "PYTHONPATH=src python3 -m unittest discover -s src/tests -p 'test_*.py' -v",
+        "test:frontend": "cd src/static && npm test"
+    },
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/nerc-project/coldfront-nerc.git"
+    },
+    "keywords": [],
+    "author": "",
+    "license": "ISC",
+    "bugs": {
+        "url": "https://github.com/nerc-project/coldfront-nerc/issues"
+    },
+    "homepage": "https://github.com/nerc-project/coldfront-nerc#readme"
+}

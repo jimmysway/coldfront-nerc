@@ -1,8 +1,9 @@
 import { test, expect } from '@playwright/test';
-import { readFileSync } from 'fs';
 import path from 'path';
+import { fileURLToPath } from 'url';
 
-const FIXTURE_URL = `file://${path.resolve('tests/fixtures/chart_test.html')}`;
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
+const FIXTURE_URL = `file://${path.join(__dirname, '..', 'fixtures', 'chart_test.html')}`;
 
 const BREAKPOINTS = [
   { name: 'desktop', width: 1280, height: 800 },
@@ -11,12 +12,13 @@ const BREAKPOINTS = [
   { name: 'narrow',  width: 360,  height: 640 },
 ];
 
-// Helpers to inject data and initialize the chart from within the page context.
-// The allocation_detail.js script reads from a <script id="charges-data"> element,
-// so we inject that element and then run the initialization logic manually.
+// Inject charges JSON and rebuild chart using the same helpers as production (window.__nercChart).
 async function injectDataAndRender(page, rawData) {
-  await page.evaluate((data) => {
-    // Inject charges-data element the way Django's json_script template tag would
+  await page.evaluate((json) => {
+    const api = window.__nercChart;
+    if (!api) throw new Error('__nercChart missing; load allocation_detail.js before tests');
+
+    const data = JSON.parse(json);
     let el = document.getElementById('charges-data');
     if (!el) {
       el = document.createElement('script');
@@ -26,51 +28,40 @@ async function injectDataAndRender(page, rawData) {
     }
     el.textContent = JSON.stringify(data);
 
-    // Re-run chart initialization since the page has already loaded
-    const transformed = window.transformCumulativeChargesForTest
-      ? window.transformCumulativeChargesForTest(data)
-      : null;
-
+    const transformed = api.transformCumulativeCharges(data);
     const ctx = document.getElementById('allocationUsageChart');
-    if (ctx && transformed) {
-      const existing = typeof Chart !== 'undefined' && Chart.getChart ? Chart.getChart(ctx) : null;
-      if (existing) existing.destroy();
-      if (window._testChart) window._testChart.destroy();
-      let processedDatasets = transformed.datasets.map((ds, idx) =>
-        ChartUtils.processDatasetForChart(ds, idx)
-      );
-      const dataLength = processedDatasets.reduce((max, ds) => Math.max(max, ds.data?.length || 0), 0);
-      const isLowDataState = dataLength < 4;
-      const labels = ChartUtils.generateUsageLabels(transformed.year, transformed.month);
-      const chartLabels = isLowDataState ? ChartUtils.getCenteredLabels(labels, dataLength) : labels.slice(0, dataLength);
-      if (isLowDataState) {
-        processedDatasets = processedDatasets.map(ds =>
-          ds.data ? { ...ds, data: ChartUtils.getCenteredData(ds.data) } : ds
-        );
-      } else {
-        processedDatasets = processedDatasets.map(ds => ({
-          ...ds,
-          data: (ds.data || []).slice(0, dataLength)
-        }));
-      }
-      window._testChart = new Chart(ctx, {
-        type: 'line',
-        data: { labels: chartLabels, datasets: processedDatasets },
-        plugins: ChartUtils.missingDataGrayscalePlugin ? [ChartUtils.missingDataGrayscalePlugin] : [],
-        options: { responsive: true, maintainAspectRatio: false, animation: false },
-      });
-    }
-
-    // Hide card if no data
     const card = document.getElementById('su-costs-card');
-    if (card && (!transformed || !transformed.datasets.length)) {
-      card.style.display = 'none';
-    } else if (card) {
-      card.style.display = '';
-    }
-  }, rawData);
 
-  // Allow the chart to finish rendering
+    if (ctx && typeof Chart !== 'undefined' && Chart.getChart) {
+      const existing = Chart.getChart(ctx);
+      if (existing) existing.destroy();
+    }
+    if (window._testChart) {
+      window._testChart.destroy();
+      window._testChart = null;
+    }
+
+    if (!ctx) return;
+
+    if (!transformed || !transformed.datasets.length) {
+      if (card) card.style.display = 'none';
+      return;
+    }
+    if (card) card.style.display = '';
+
+    const payload = api.buildUsageChartPayload(
+      transformed.datasets,
+      transformed.year,
+      transformed.month
+    );
+    const baseOptions = buildUsageChartOptions(api.getUsageChartOptionDeps());
+    window._testChart = new Chart(ctx, {
+      type: 'line',
+      data: { labels: payload.chartLabels, datasets: payload.processedDatasets },
+      options: Object.assign({}, baseOptions, { animation: false }),
+    });
+  }, JSON.stringify(rawData));
+
   await page.waitForTimeout(300);
 }
 
@@ -78,11 +69,28 @@ async function injectDataAndRender(page, rawData) {
 // Data fixtures
 // -----------------------------------------------------------------------
 
+/** Twenty days of cumulative-style charges (Feb 1–20) for the “regular data” visual. */
 const REGULAR_DATA = {
   '2025-02-01': { 'OpenStack CPU SU': '10.00', 'OpenStack GPU A100 SU': '5.00' },
-  '2025-02-02': { 'OpenStack CPU SU': '22.50', 'OpenStack GPU A100 SU': '11.00' },
-  '2025-02-03': { 'OpenStack CPU SU': '37.80', 'OpenStack GPU A100 SU': '18.50' },
-  // ... 28 days would be added in real fixture, abbreviated here for illustration
+  '2025-02-02': { 'OpenStack CPU SU': '22.50', 'OpenStack GPU A100 SU': '11.50' },
+  '2025-02-03': { 'OpenStack CPU SU': '37.70', 'OpenStack GPU A100 SU': '18.80' },
+  '2025-02-04': { 'OpenStack CPU SU': '48.70', 'OpenStack GPU A100 SU': '24.60' },
+  '2025-02-05': { 'OpenStack CPU SU': '63.50', 'OpenStack GPU A100 SU': '31.70' },
+  '2025-02-06': { 'OpenStack CPU SU': '76.60', 'OpenStack GPU A100 SU': '38.10' },
+  '2025-02-07': { 'OpenStack CPU SU': '89.00', 'OpenStack GPU A100 SU': '44.00' },
+  '2025-02-08': { 'OpenStack CPU SU': '105.00', 'OpenStack GPU A100 SU': '52.00' },
+  '2025-02-09': { 'OpenStack CPU SU': '119.50', 'OpenStack GPU A100 SU': '59.20' },
+  '2025-02-10': { 'OpenStack CPU SU': '133.40', 'OpenStack GPU A100 SU': '66.00' },
+  '2025-02-11': { 'OpenStack CPU SU': '145.60', 'OpenStack GPU A100 SU': '72.10' },
+  '2025-02-12': { 'OpenStack CPU SU': '161.20', 'OpenStack GPU A100 SU': '79.90' },
+  '2025-02-13': { 'OpenStack CPU SU': '175.30', 'OpenStack GPU A100 SU': '86.80' },
+  '2025-02-14': { 'OpenStack CPU SU': '188.60', 'OpenStack GPU A100 SU': '93.30' },
+  '2025-02-15': { 'OpenStack CPU SU': '201.50', 'OpenStack GPU A100 SU': '99.50' },
+  '2025-02-16': { 'OpenStack CPU SU': '217.90', 'OpenStack GPU A100 SU': '107.60' },
+  '2025-02-17': { 'OpenStack CPU SU': '232.60', 'OpenStack GPU A100 SU': '115.00' },
+  '2025-02-18': { 'OpenStack CPU SU': '246.10', 'OpenStack GPU A100 SU': '121.60' },
+  '2025-02-19': { 'OpenStack CPU SU': '261.20', 'OpenStack GPU A100 SU': '129.10' },
+  '2025-02-20': { 'OpenStack CPU SU': '275.50', 'OpenStack GPU A100 SU': '136.10' },
 };
 
 const LOW_DATA = {
@@ -91,25 +99,13 @@ const LOW_DATA = {
   '2025-02-03': { 'OpenStack CPU SU': '37.80', 'OpenStack GPU A100 SU': '18.50', 'OpenShift CPU SU': '12.10' },
 };
 
-const MISSING_DATA = {
-  '2025-02-01': { 'OpenStack CPU SU': '10.00', 'OpenStack GPU A100 SU': '5.00', 'OpenShift Storage SU': '2.00' },
-  '2025-02-02': {},  // missing day
-  '2025-02-03': { 'OpenStack CPU SU': '37.80', 'OpenStack GPU A100 SU': '18.50', 'OpenShift Storage SU': '8.50' },
-  '2025-02-04': { 'OpenStack CPU SU': '55.00', 'OpenStack GPU A100 SU': '28.00', 'OpenShift Storage SU': '14.00' },
-  '2025-02-05': { 'OpenStack CPU SU': '72.10', 'OpenStack GPU A100 SU': '39.20', 'OpenShift Storage SU': '20.50' },
-};
-
-// Three consecutive missing days between two known values.
-// Used to assert that all missing points in a run are filled with the same
-// midpoint value (flat plateau) rather than a linear ramp across the gap.
-const CONSECUTIVE_MISSING_DATA = {
-  '2025-02-01': { 'OpenStack CPU SU': '10.00' },
-  '2025-02-02': {},
+/** One day with no charge rows — backend sends `{}`; chart should break lines (spanGaps false). */
+const MISSING_DAY_DATA = {
+  '2025-02-01': { 'OpenStack CPU SU': '10.00', 'OpenStack GPU A100 SU': '5.00' },
+  '2025-02-02': { 'OpenStack CPU SU': '37.80', 'OpenStack GPU A100 SU': '18.50' },
   '2025-02-03': {},
-  '2025-02-04': {},
-  '2025-02-05': { 'OpenStack CPU SU': '50.00' },
-  '2025-02-06': { 'OpenStack CPU SU': '65.00' },
-  '2025-02-07': { 'OpenStack CPU SU': '80.00' },
+  '2025-02-04': { 'OpenStack CPU SU': '55.00', 'OpenStack GPU A100 SU': '28.00' },
+  '2025-02-05': { 'OpenStack CPU SU': '72.10', 'OpenStack GPU A100 SU': '39.20' },
 };
 
 // -----------------------------------------------------------------------
@@ -136,26 +132,20 @@ for (const bp of BREAKPOINTS) {
       await expect(page).toHaveScreenshot(`no-data-${bp.name}.png`);
     });
 
-    test('centers chart content with low data (1-3 points)', async ({ page }) => {
+    test('renders chart with few days of data (1-3 points)', async ({ page }) => {
       await injectDataAndRender(page, LOW_DATA);
       await expect(page.locator('#su-costs-card')).toBeVisible();
-      // Verify centering padding is applied: chart canvas should be visible
       await expect(page.locator('#allocationUsageChart')).toBeVisible();
       await expect(page).toHaveScreenshot(`low-data-${bp.name}.png`);
     });
 
-    test('renders grayscale regions for missing data', async ({ page }) => {
-      await injectDataAndRender(page, MISSING_DATA);
+    test('renders gaps when a day has no charge data', async ({ page }) => {
+      await injectDataAndRender(page, MISSING_DAY_DATA);
+      await expect(page.locator('#su-costs-card')).toBeVisible();
       await expect(page.locator('#allocationUsageChart')).toBeVisible();
-      // Visual regression catches the grayscale plugin output
-      await expect(page).toHaveScreenshot(`missing-data-${bp.name}.png`);
+      await expect(page).toHaveScreenshot(`missing-day-data-${bp.name}.png`);
     });
 
-    test('renders grayscale regions for consecutive missing data', async ({ page }) => {
-      await injectDataAndRender(page, CONSECUTIVE_MISSING_DATA);
-      await expect(page.locator('#allocationUsageChart')).toBeVisible();
-      await expect(page).toHaveScreenshot(`consecutive-missing-data-${bp.name}.png`);
-    });
   });
 }
 
@@ -163,32 +153,34 @@ for (const bp of BREAKPOINTS) {
 // Functional behaviour tests (not breakpoint-specific)
 // -----------------------------------------------------------------------
 
-// Consecutive nulls are intentionally filled with the midpoint of the nearest
-// surrounding valid values — a flat plateau across the gap. This is preferable
-// to linear interpolation because the grayscale overlay already signals that
-// the data is absent; a ramp would imply a known trend where none exists.
-test('interpolateMissingData fills a consecutive null run with a flat midpoint plateau', async ({ page }) => {
+test('empty charge day becomes null in transformed datasets', async ({ page }) => {
   await page.goto(FIXTURE_URL);
+  // Build payload inside the page so `{}` day entries are not altered by evaluate() cloning.
   const result = await page.evaluate(() => {
-    // [10, null, null, null, 50] — three consecutive missing points
-    const { data, missingIndices } = ChartUtils.interpolateMissingData([10, null, null, null, 50]);
-    // Set is not JSON-serialisable, convert before returning across the evaluate boundary
-    return { data, missingIndices: [...missingIndices] };
+    const data = {
+      '2025-02-01': { 'OpenStack CPU SU': '10.00', 'OpenStack GPU A100 SU': '5.00' },
+      '2025-02-02': {},
+      '2025-02-03': { 'OpenStack CPU SU': '37.80', 'OpenStack GPU A100 SU': '18.50' },
+      '2025-02-04': { 'OpenStack CPU SU': '55.00', 'OpenStack GPU A100 SU': '28.00' },
+      '2025-02-05': { 'OpenStack CPU SU': '72.10', 'OpenStack GPU A100 SU': '39.20' },
+    };
+    const sortedKeys = Object.keys(data).sort();
+    const t = window.__nercChart.transformCumulativeCharges(data);
+    const cpu = t.datasets.find((d) => d.label === 'OpenStack CPU SU');
+    const feb2Index = sortedKeys.indexOf('2025-02-02');
+    return {
+      sortedKeys,
+      feb2Index,
+      seriesLen: cpu.data.length,
+      valueAtFeb2: cpu.data[feb2Index],
+      cpuFirst: cpu.data[0],
+    };
   });
-
-  const midpoint = (10 + 50) / 2; // 30
-  expect(result.data[1]).toBeCloseTo(midpoint);
-  expect(result.data[2]).toBeCloseTo(midpoint);
-  expect(result.data[3]).toBeCloseTo(midpoint);
-
-  // All three indices must be marked as missing so the grayscale overlay covers them
-  expect(result.missingIndices).toContain(1);
-  expect(result.missingIndices).toContain(2);
-  expect(result.missingIndices).toContain(3);
-
-  // Boundary values must be untouched
-  expect(result.data[0]).toBe(10);
-  expect(result.data[4]).toBe(50);
+  expect(result.sortedKeys).toContain('2025-02-02');
+  expect(result.feb2Index).toBe(1);
+  expect(result.seriesLen).toBe(result.sortedKeys.length);
+  expect(result.valueAtFeb2).toBeNull();
+  expect(result.cpuFirst).toBe(10);
 });
 
 test('cumulative-to-daily toggle updates the chart', async ({ page }) => {

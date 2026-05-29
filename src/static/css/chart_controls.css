@@ -1,131 +1,89 @@
 /* Chart Controls Styles */
 
-/* ========================================
-   PILL GROUP - Shared base styles
-   Used by: toggles, pagination
-   ======================================== */
-
-/* Container */
-.pill-group {
-  display: inline-flex;
-  background: #f0f0f0;
-  border-radius: 8px;
-  padding: 3px;
-  overflow: hidden;
-}
-
-/* Item button */
-.pill-item {
-  padding: 6px 14px;
-  font-size: 13px;
-  font-weight: 600;
-  border: none;
-  border-radius: 6px;
-  background: transparent;
-  color: #888;
-  cursor: pointer;
-  transition: all 0.2s ease;
-}
-
-.pill-item:hover {
-  color: #555;
-}
-
-/* Active state - works with .active or .current */
-.pill-item.active,
-.pill-item.current {
-  background: #fff;
-  color: #333;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-}
-
-/* ======================================== */
-
 /* Chart info header */
 .chart-info-header {
-  border-bottom: none;
+    border-bottom: none;
 }
 
 .chart-title {
-  color: #333;
+    color: #333;
 }
 
 /* Toolbar section */
 .chart-toolbar {
-  border-bottom: none;
+    border-bottom: none;
 }
 
 /* Toggle button groups - override Bootstrap btn-group */
 .btn-group.toggle-btn-group-view,
 .btn-group.toggle-btn-group-mode {
-  background: #f0f0f0 !important;
-  border: none !important;
-  border-radius: 8px !important;
-  overflow: hidden !important;
-  padding: 3px !important;
-  display: inline-flex !important;
+    background: #f0f0f0 !important;
+    border: none !important;
+    border-radius: 8px !important;
+    overflow: hidden !important;
+    padding: 3px !important;
+    display: inline-flex !important;
 }
 
 /* Toggle button base - override Bootstrap btn */
 .btn.toggle-btn {
-  border: none !important;
-  box-shadow: none !important;
-  outline: none !important;
-  transition: all 0.2s ease !important;
-  padding: 6px 14px !important;
-  font-size: 13px !important;
-  font-weight: 600 !important;
-  border-radius: 6px !important;
-  margin: 0 !important;
+    border: none !important;
+    box-shadow: none !important;
+    outline: none !important;
+    transition: all 0.2s ease !important;
+    padding: 6px 14px !important;
+    font-size: 13px !important;
+    font-weight: 600 !important;
+    border-radius: 6px !important;
+    margin: 0 !important;
 }
 
 .btn.toggle-btn:focus,
 .btn.toggle-btn:active,
 .btn.toggle-btn:hover {
-  box-shadow: none !important;
-  outline: none !important;
+    box-shadow: none !important;
+    outline: none !important;
 }
 
 /* Active state */
 .btn.toggle-btn.active {
-  background: #fff !important;
-  color: #333 !important;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1) !important;
+    background: #fff !important;
+    color: #333 !important;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1) !important;
 }
 
 /* Inactive state */
 .btn.toggle-btn:not(.active) {
-  background: transparent !important;
-  color: #888 !important;
+    background: transparent !important;
+    color: #888 !important;
 }
 
 .btn.toggle-btn:not(.active):hover {
-  color: #555 !important;
+    color: #555 !important;
 }
 
 /* Export CSV button */
 .export-csv-btn {
-  background: #539642;
-  border: none;
-  border-radius: 8px;
-  padding: 9px 14px;
-  font-size: 13px;
-  font-weight: 600;
-  color: #fff;
-  transition: all 0.2s ease;
+    background: #539642;
+    border: none;
+    border-radius: 8px;
+    padding: 9px 14px;
+    font-size: 13px;
+    font-weight: 600;
+    color: #fff;
+    transition: all 0.2s ease;
 }
 
 .export-csv-btn:hover {
-  background: #2a5c1d;
-  color: #fff;
+    background: #2a5c1d;
+    color: #fff;
 }
 
 .export-csv-btn:focus,
 .export-csv-btn:active {
-  box-shadow: none !important;
-  outline: none !important;
+    box-shadow: none !important;
+    outline: none !important;
 }
-
 
 /* ========================================
    RESPONSIVE BREAKPOINTS
@@ -133,151 +91,130 @@
 
 /* Medium screens (tablets) */
 @media (max-width: 768px) {
-  /* Chart height responsive */
-  #chart-view {
-    height: 550px !important;
-  }
+    /* Chart height responsive */
+    #chart-view {
+        height: 550px !important;
+    }
 
-  .chart-title {
-    font-size: 1.1rem !important;
-  }
+    .chart-title {
+        font-size: 1.1rem !important;
+    }
 
-  #chart-subtitle {
-    font-size: 0.8rem !important;
-  }
+    #chart-subtitle {
+        font-size: 0.8rem !important;
+    }
 
-  .pill-item {
-    padding: 5px 10px;
-    font-size: 12px;
-  }
+    .btn.toggle-btn {
+        padding: 5px 10px !important;
+        font-size: 12px !important;
+    }
 
-  .btn.toggle-btn {
-    padding: 5px 10px !important;
-    font-size: 12px !important;
-  }
+    .btn-group.toggle-btn-group-view,
+    .btn-group.toggle-btn-group-mode {
+        border-radius: 6px !important;
+        padding: 2px !important;
+    }
 
-  .btn-group.toggle-btn-group-view,
-  .btn-group.toggle-btn-group-mode {
-    border-radius: 6px !important;
-    padding: 2px !important;
-  }
-
-  .export-csv-btn {
-    padding: 7px 10px;
-    font-size: 12px;
-    border-radius: 6px;
-  }
+    .export-csv-btn {
+        padding: 7px 10px;
+        font-size: 12px;
+        border-radius: 6px;
+    }
 }
 
 /* Small screens (large phones) - icon only for view toggle and export */
 @media (max-width: 576px) {
-  .chart-title {
-    font-size: 1rem !important;
-  }
+    .chart-title {
+        font-size: 1rem !important;
+    }
 
-  #chart-subtitle {
-    font-size: 0.75rem !important;
-  }
+    #chart-subtitle {
+        font-size: 0.75rem !important;
+    }
 
-  .pill-item {
-    padding: 4px 8px;
-    font-size: 11px;
-    border-radius: 4px;
-  }
+    /* Chart height responsive */
+    #chart-view {
+        height: 400px !important;
+    }
 
-  .pill-group {
-    border-radius: 6px;
-    padding: 2px;
-  }
+    /* Icon-only buttons for graph/table toggle */
+    .btn-group.toggle-btn-group-view .btn.toggle-btn {
+        padding: 8px 10px !important;
+        font-size: 0 !important;
+        border-radius: 6px !important;
+    }
 
-  /* Chart height responsive */
-  #chart-view {
-    height: 400px !important;
-  }
+    .btn-group.toggle-btn-group-view .btn.toggle-btn i {
+        font-size: 16px !important;
+        margin-right: 0 !important;
+    }
 
-  /* Icon-only buttons for graph/table toggle */
-  .btn-group.toggle-btn-group-view .btn.toggle-btn {
-    padding: 8px 10px !important;
-    font-size: 0 !important;
-    border-radius: 6px !important;
-  }
+    /* Text toggles stay normal but smaller */
+    .btn-group.toggle-btn-group-mode .btn.toggle-btn {
+        padding: 6px 10px !important;
+        font-size: 11px !important;
+        border-radius: 6px !important;
+    }
 
-  .btn-group.toggle-btn-group-view .btn.toggle-btn i {
-    font-size: 16px !important;
-    margin-right: 0 !important;
-  }
+    .btn-group.toggle-btn-group-view,
+    .btn-group.toggle-btn-group-mode {
+        border-radius: 8px !important;
+        padding: 2px !important;
+    }
 
-  /* Text toggles stay normal but smaller */
-  .btn-group.toggle-btn-group-mode .btn.toggle-btn {
-    padding: 6px 10px !important;
-    font-size: 11px !important;
-    border-radius: 6px !important;
-  }
+    /* Icon-only export button */
+    .export-csv-btn {
+        padding: 8px 10px;
+        font-size: 0;
+        border-radius: 8px;
+    }
 
-  .btn-group.toggle-btn-group-view,
-  .btn-group.toggle-btn-group-mode {
-    border-radius: 8px !important;
-    padding: 2px !important;
-  }
-
-  /* Icon-only export button */
-  .export-csv-btn {
-    padding: 8px 10px;
-    font-size: 0;
-    border-radius: 8px;
-  }
-
-  .export-csv-btn i {
-    font-size: 16px;
-    margin-right: 0 !important;
-  }
+    .export-csv-btn i {
+        font-size: 16px;
+        margin-right: 0 !important;
+    }
 }
 
 /* Extra small screens (small phones) - compact icon-only */
 @media (max-width: 400px) {
-  .chart-title {
-    font-size: 0.9rem !important;
-  }
+    .chart-title {
+        font-size: 0.9rem !important;
+    }
 
-  #chart-subtitle {
-    font-size: 0.7rem !important;
-  }
+    #chart-subtitle {
+        font-size: 0.7rem !important;
+    }
 
-  /* Chart height responsive */
-  #chart-view {
-    height: 420px !important;
-  }
+    /* Chart height responsive */
+    #chart-view {
+        height: 420px !important;
+    }
 
-  .pill-item {
-    padding: 4px 8px;
-    font-size: 10px;
-  }
+    /* Icon-only buttons for graph/table toggle */
+    .btn-group.toggle-btn-group-view .btn.toggle-btn {
+        padding: 7px 9px !important;
+        font-size: 0 !important;
+    }
 
-  /* Icon-only buttons for graph/table toggle */
-  .btn-group.toggle-btn-group-view .btn.toggle-btn {
-    padding: 7px 9px !important;
-    font-size: 0 !important;
-  }
+    .btn-group.toggle-btn-group-view .btn.toggle-btn i {
+        font-size: 14px !important;
+    }
 
-  .btn-group.toggle-btn-group-view .btn.toggle-btn i {
-    font-size: 14px !important;
-  }
+    /* Text toggles */
+    .btn-group.toggle-btn-group-mode .btn.toggle-btn {
+        padding: 5px 8px !important;
+        font-size: 10px !important;
+    }
 
-  /* Text toggles */
-  .btn-group.toggle-btn-group-mode .btn.toggle-btn {
-    padding: 5px 8px !important;
-    font-size: 10px !important;
-  }
+    /* Icon-only export button */
+    .export-csv-btn {
+        padding: 7px 9px;
+        font-size: 0;
+    }
 
-  /* Icon-only export button */
-  .export-csv-btn {
-    padding: 7px 9px;
-    font-size: 0;
-  }
-
-  .export-csv-btn i {
-    font-size: 14px;
-  }
+    .export-csv-btn i {
+        font-size: 14px;
+    }
 }
 
 /* ========================================
@@ -285,13 +222,12 @@
    ======================================== */
 
 #chart-view {
-  /* GPU acceleration for smoother rendering */
-  transform: translateZ(0);
-  backface-visibility: hidden;
+    /* GPU acceleration for smoother rendering */
+    transform: translateZ(0);
+    backface-visibility: hidden;
 }
 
 #allocationUsageChart {
-  /* Let browser use best quality scaling */
-  image-rendering: auto;
+    /* Let browser use best quality scaling */
+    image-rendering: auto;
 }
-

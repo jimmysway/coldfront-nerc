@@ -1,18 +1,12 @@
 /**
  * Chart Configuration Module
- * 
- * Centralizes chart configuration including:
- * - Dataset color definitions
- * - Chart styling options
+ *
+ * Dataset color definitions for usage charts.
  */
 
 const ChartConfig = (function() {
   'use strict';
 
-  /* ========================================
-     DATASET COLOR PALETTE
-     ======================================== */
-  
   const DATASET_COLORS = {
     cpu: {
       border: 'rgb(0, 192, 232)',
@@ -49,42 +43,6 @@ const ChartConfig = (function() {
     DATASET_COLORS.network
   ];
 
-  /* ========================================
-     CHART STYLING
-     ======================================== */
-
-  const LINE_STYLE = {
-    fill: true,
-    borderWidth: 2,
-    tension: 0.25,
-    pointRadius: 0,
-    hoverRadius: 4,
-    borderJoinStyle: 'round',
-    borderCapStyle: 'round'
-  };
-
-  const MISSING_DATA_STYLE = {
-    segmentColor: 'rgba(70, 70, 70, 0.7)',
-    gradientColor: 'rgb(160, 160, 160)',
-    fillOpacity: 0.08
-  };
-
-  const GRADIENT_CONFIG = {
-    startOpacity: 0.13,
-    fadeHeight: 150,
-    padding: 20
-  };
-
-  /* ========================================
-     PUBLIC API
-     ======================================== */
-
-  return {
-    DATASET_COLORS: DATASET_COLORS,
-    COLOR_PALETTE: COLOR_PALETTE,
-    LINE_STYLE: LINE_STYLE,
-    MISSING_DATA_STYLE: MISSING_DATA_STYLE,
-    GRADIENT_CONFIG: GRADIENT_CONFIG
-  };
+  return { DATASET_COLORS, COLOR_PALETTE };
 
 })();

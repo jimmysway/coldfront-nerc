@@ -7,6 +7,13 @@ from coldfront.config.env import ENV
 from coldfront.config.core import ALLOCATION_ATTRIBUTE_VIEW_LIST
 
 
+def _env_bool(name):
+    val = os.environ.get(name)
+    if val is not None:
+        return val.lower() in ('true', '1', 'yes')
+    return ENV.bool(name, default=False)
+
+
 NERC_STD_PLUGIN_CONFIGS = [
     'coldfront_plugin_api.config',
     'coldfront_plugin_cloud.config',
@@ -26,18 +33,14 @@ for cnf in NERC_ALL_PLUGIN_CONFIGS:
 
 ADDITIONAL_USER_SEARCH_CLASSES = ["coldfront_plugin_keycloak_usersearch.search.KeycloakUserSearch"]
 
-# ColdFront upstream ignores the env var even though it exposes the setting.
-# https://github.com/ubccr/coldfront/blob/c490acddd2853a39201ebc58d3ba0d2c1eb8f623/coldfront/config/core.py#L80
 ACCOUNT_CREATION_TEXT = os.getenv('ACCOUNT_CREATION_TEXT')
 
-# Removes the Invoice menu from the menu bar.
 INVOICE_ENABLED = False
 
 SESSION_COOKIE_SAMESITE = ENV.get_value('SESSION_COOKIE_SAMESITE',
                                         default='Lax')
 
-if os.getenv('DEBUG', 'False') == 'True':
-    SESSION_COOKIE_SECURE = False
+INSTALLED_APPS += ['nerc_allocation']
 
 DATABASES = {
     'default': {
@@ -46,9 +49,9 @@ DATABASES = {
             default='django.db.backends.mysql'
         ),
         'NAME': ENV.get_value('DATABASE_NAME', default='coldfront'),
-        'USER': ENV.get_value('DATABASE_USER'),
-        'PASSWORD': ENV.get_value('DATABASE_PASSWORD'),
-        'HOST': ENV.get_value('DATABASE_HOST'),
+        'USER': ENV.get_value('DATABASE_USER', default=''),
+        'PASSWORD': ENV.get_value('DATABASE_PASSWORD', default=''),
+        'HOST': ENV.get_value('DATABASE_HOST', default=''),
         'PORT': ENV.get_value('DATABASE_PORT', default=3306),
     },
 }
@@ -80,3 +83,15 @@ if 'Allocated Project Name' not in ALLOCATION_ATTRIBUTE_VIEW_LIST:
     ALLOCATION_ATTRIBUTE_VIEW_LIST += [
         'Allocated Project Name'
     ]
+
+# Last: shell exports win; plugins must not leave ALLOWED_HOSTS empty for runserver.
+DEBUG = _env_bool('DEBUG')
+if not ALLOWED_HOSTS:
+    ALLOWED_HOSTS = ['localhost', '127.0.0.1', '[::1]']
+if DEBUG:
+    SESSION_COOKIE_SECURE = False
+    import logging
+
+    logging.getLogger('nerc_allocation').setLevel(logging.INFO)
+    if not logging.getLogger().handlers:
+        logging.basicConfig(level=logging.INFO)

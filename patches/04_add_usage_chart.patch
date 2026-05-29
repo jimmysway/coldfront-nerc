@@ -66,7 +66,7 @@ index 369cf81..cfea375 100644
  {% if eulas %}
  <div class="card mb-3">
    <div class="card-header">
-@@ -470,4 +527,13 @@ Allocation Detail
+@@ -470,4 +527,15 @@ Allocation Detail
      }
    })
  </script>
@@ -81,5 +81,6 @@ index 369cf81..cfea375 100644
 +<script src="{% static 'js/chart_utils.js' %}"></script>
 +<script src="{% static 'js/chart_config.js' %}"></script>
 +<script src="{% static 'js/chart_tooltip.js' %}"></script>
++<script src="{% static 'js/charge_data_loader.js' %}"></script>
 +<script src="{% static 'js/allocation_detail.js' %}"></script>
 +{% endblock %}

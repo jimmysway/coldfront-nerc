@@ -1,7 +1,7 @@
 /**
  * Unit tests for chart_utils.js.
- * We test these because the chart needs to behave correctly when data is missing,
- * sparse, or empty. Bugs here cause wrong numbers on screen or broken layouts.
+ * We test these because the chart needs to behave correctly when data is sparse
+ * or empty. Bugs here cause wrong numbers on screen or broken layouts.
  */
 import { readFileSync } from 'fs';
 import { fileURLToPath } from 'url';
@@ -19,42 +19,33 @@ function loadChartUtils() {
 }
 const ChartUtils = loadChartUtils();
 
-// When the backend has gaps (e.g. a day with no charges), we fill them so the line
-// still draws. We must remember which points were filled so the chart can grey them out.
-describe('interpolateMissingData', () => {
-  it('returns data unchanged when no nulls are present', () => {
-    const { data } = ChartUtils.interpolateMissingData([10, 20, 30]);
-    expect(data).toEqual([10, 20, 30]);
+describe('processDatasetForChart', () => {
+  const baseDataset = {
+    label: 'OpenStack CPU SU',
+    data: [10, 20, 37.8],
+    borderColor: 'rgb(0, 192, 232)',
+    backgroundColor: 'rgba(0, 192, 232, 0.1)'
+  };
+
+  it('sets spanGaps false so Chart.js does not draw across null gaps', () => {
+    const out = ChartUtils.processDatasetForChart(baseDataset, 0);
+    expect(out.spanGaps).toBe(false);
   });
 
-  it('fills a single null with midpoint between neighbours', () => {
-    const { data, missingIndices } = ChartUtils.interpolateMissingData([10, null, 30]);
-    expect(data[1]).toBe(20);
-    expect(missingIndices.has(1)).toBe(true);
+  it('passes data through unchanged', () => {
+    const out = ChartUtils.processDatasetForChart(baseDataset, 0);
+    expect(out.data).toEqual([10, 20, 37.8]);
   });
 
-  it('fills leading null with the first valid value', () => {
-    const { data } = ChartUtils.interpolateMissingData([null, null, 30]);
-    expect(data[0]).toBe(30);
-    expect(data[1]).toBe(30);
+  it('uses the palette backgroundColor for fill instead of a dynamic gradient', () => {
+    const out = ChartUtils.processDatasetForChart(baseDataset, 1);
+    expect(out.backgroundColor).toBe(baseDataset.backgroundColor);
+    expect(typeof out.backgroundColor).toBe('string');
   });
 
-  it('fills trailing null with the last valid value', () => {
-    const { data } = ChartUtils.interpolateMissingData([10, null, null]);
-    expect(data[1]).toBe(10);
-    expect(data[2]).toBe(10);
-  });
-
-  it('returns zeros when all data is null (no data state)', () => {
-    const { data } = ChartUtils.interpolateMissingData([null, null, null]);
-    expect(data).toEqual([0, 0, 0]);
-  });
-
-  it('tracks multiple discontiguous missing regions', () => {
-    const { missingIndices } = ChartUtils.interpolateMissingData([10, null, 30, null, 50]);
-    expect(missingIndices.has(1)).toBe(true);
-    expect(missingIndices.has(3)).toBe(true);
-    expect(missingIndices.has(0)).toBe(false);
+  it('assigns stacking order from palette index', () => {
+    expect(ChartUtils.processDatasetForChart(baseDataset, 0).order).toBe(3);
+    expect(ChartUtils.processDatasetForChart(baseDataset, 1).order).toBe(2);
   });
 });
 
@@ -72,7 +63,7 @@ describe('calculateDailyData', () => {
     expect(result[2]).toBe(50);
   });
 
-  it('propagates null when a value is missing (missing data state)', () => {
+  it('propagates null when the cumulative series has a null point', () => {
     const result = ChartUtils.calculateDailyData([100, null, 200]);
     expect(result[1]).toBeNull();
     expect(result[2]).toBeNull(); // can't diff against a null predecessor
@@ -89,39 +80,6 @@ describe('calculateDailyData', () => {
   });
 });
 
-// With only 1–3 data points, the chart looks lopsided. We pad with empty slots so the
-// line sits in the middle. These helpers align labels and data for that layout.
-describe('getCenteredLabels', () => {
-  const labels = ['Jan 1', 'Jan 2', 'Jan 3'];
-
-  it('pads 1 data point with empty strings on each side', () => {
-    const result = ChartUtils.getCenteredLabels(labels, 1);
-    expect(result).toEqual(['', 'Jan 1', '']);
-  });
-
-  it('returns labels unchanged when dataLength >= 4', () => {
-    const fourLabels = ['Jan 1', 'Jan 2', 'Jan 3', 'Jan 4'];
-    const result = ChartUtils.getCenteredLabels(fourLabels, 4);
-    expect(result).toEqual(fourLabels);
-  });
-});
-
-// Same centering idea but for the data values: nulls on the sides so the line is centred.
-describe('getCenteredData', () => {
-  it('wraps a single point in nulls', () => {
-    expect(ChartUtils.getCenteredData([5])).toEqual([null, 5, null]);
-  });
-
-  it('wraps two points in nulls', () => {
-    expect(ChartUtils.getCenteredData([5, 10])).toEqual([null, 5, 10, null]);
-  });
-
-  it('returns data unchanged for 4+ points', () => {
-    const data = [1, 2, 3, 4];
-    expect(ChartUtils.getCenteredData(data)).toEqual(data);
-  });
-});
-
 // On small screens we show fewer date labels to avoid crowding. This decides how often
 // to show a tick. Wrong intervals make the x-axis unreadable on mobile.
 describe('getResponsiveTickInterval', () => {
@@ -133,6 +91,22 @@ describe('getResponsiveTickInterval', () => {
   it('targets 10 ticks on wide screens (>=800px)', () => {
     const interval = ChartUtils.getResponsiveTickInterval(31, 900);
     expect(interval).toBe(Math.max(1, Math.ceil(31 / 10)));
+  });
+});
+
+// Chart.js autoSkip uses this as a ceiling; breakpoints match getResponsiveTickInterval.
+describe('getResponsiveMaxTicksLimit', () => {
+  it('returns 4 below 400px width', () => {
+    expect(ChartUtils.getResponsiveMaxTicksLimit(350)).toBe(4);
+  });
+  it('returns 6 below 600px', () => {
+    expect(ChartUtils.getResponsiveMaxTicksLimit(500)).toBe(6);
+  });
+  it('returns 8 below 800px', () => {
+    expect(ChartUtils.getResponsiveMaxTicksLimit(700)).toBe(8);
+  });
+  it('returns 10 at 800px and above', () => {
+    expect(ChartUtils.getResponsiveMaxTicksLimit(900)).toBe(10);
   });
 });
 

@@ -96,45 +96,6 @@
   flex-shrink: 0;
 }
 
-#chartjs-tooltip .tooltip-error-row {
-  opacity: 0.7;
-}
-
-#chartjs-tooltip .tooltip-error-label {
-  color: #999;
-  font-style: italic;
-}
-
-#chartjs-tooltip .tooltip-error-message {
-  font-weight: 600;
-  color: #d32f2f;
-  white-space: nowrap;
-  flex-shrink: 0;
-  font-size: 11px;
-}
-
-#chartjs-tooltip .tooltip-error-info-row {
-  margin-top: 8px;
-  padding-top: 8px;
-}
-
-#chartjs-tooltip .tooltip-error-info-row td {
-  padding-top: 8px;
-  border-top: 1px solid #ffebee;
-}
-
-#chartjs-tooltip .tooltip-error-info {
-  font-size: 11px;
-  color: #d32f2f;
-  font-style: italic;
-  line-height: 1.4;
-}
-
-#chartjs-tooltip .tooltip-total-value-interpolated {
-  color: #666;
-  font-style: italic;
-}
-
 /* ========================================
    RESPONSIVE TOOLTIP BREAKPOINTS
    ======================================== */
@@ -175,11 +136,6 @@
     padding-top: 6px;
     margin-top: 4px;
   }
-
-  #chartjs-tooltip .tooltip-error-message,
-  #chartjs-tooltip .tooltip-error-info {
-    font-size: 10px;
-  }
 }
 
 /* Small screens (large phones) */
@@ -218,16 +174,6 @@
     padding-top: 5px;
     margin-top: 3px;
   }
-
-  #chartjs-tooltip .tooltip-error-message,
-  #chartjs-tooltip .tooltip-error-info {
-    font-size: 9px;
-  }
-
-  #chartjs-tooltip .tooltip-error-info-row {
-    margin-top: 6px;
-    padding-top: 6px;
-  }
 }
 
 /* Extra small screens (small phones) */
@@ -265,16 +211,6 @@
   #chartjs-tooltip .tooltip-total-row td {
     padding-top: 4px;
     margin-top: 2px;
-  }
-
-  #chartjs-tooltip .tooltip-error-message,
-  #chartjs-tooltip .tooltip-error-info {
-    font-size: 8px;
-  }
-
-  #chartjs-tooltip .tooltip-error-info-row {
-    margin-top: 5px;
-    padding-top: 5px;
   }
 }
 
