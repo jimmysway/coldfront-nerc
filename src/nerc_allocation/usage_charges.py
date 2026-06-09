@@ -6,7 +6,7 @@ from datetime import date
 
 from coldfront.core.allocation.models import Allocation
 from coldfront_plugin_cloud.billable_usage import get_daily_billable_usage_by_date
-from coldfront_plugin_cloud.usage_models import CumulativeChargesDict, to_dict
+from coldfront_plugin_cloud.models.usage_models import CumulativeChargesDict, to_dict
 
 logger = logging.getLogger(__name__)
 
