@@ -1,8 +1,8 @@
 diff --git a/coldfront/core/allocation/templates/allocation/allocation_detail.html b/coldfront/core/allocation/templates/allocation/allocation_detail.html
-index 369cf81b..f26e2608 100644
+index 59faa076..e1c496da 100644
 --- a/coldfront/core/allocation/templates/allocation/allocation_detail.html
 +++ b/coldfront/core/allocation/templates/allocation/allocation_detail.html
-@@ -173,6 +173,48 @@ Allocation Detail
+@@ -175,6 +175,49 @@ Allocation Detail
    </div>
  </div>
  
@@ -37,6 +37,7 @@ index 369cf81b..f26e2608 100644
 +        {% endif %}
 +      {% endfor %}
 +    {% endif %}
++    <p id="usage-table-empty" class="text-muted mb-0" style="display: none;"></p>
 +    <div class="table-responsive">
 +      <table id="allocationUsageTable" class="table table-hover">
 +        <thead>
@@ -51,12 +52,9 @@ index 369cf81b..f26e2608 100644
  {% if eulas %}
  <div class="card mb-3">
    <div class="card-header">
-@@ -470,4 +512,6 @@ Allocation Detail
-     }
-   })
+@@ -461,4 +504,5 @@ document.addEventListener('DOMContentLoaded', function() {
+   });
+ });
  </script>
--{% endblock %}
-\ No newline at end of file
-+
-+<script src="{% static 'js/allocation_detail.js' %}"></script>
-+{% endblock %}
++<script src="{% static 'js/allocation_detail.js' %}?v=2"></script>
+ {% endblock %}

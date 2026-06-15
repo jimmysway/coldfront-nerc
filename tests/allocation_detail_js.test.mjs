@@ -17,10 +17,13 @@ function loadAllocationDetailJs() {
     Date,
     window: {},
     document: {
+      readyState: 'complete',
       getElementById: () => null,
+      addEventListener: () => {},
     },
     $: undefined,
   };
+  sandbox.window = sandbox;
   vm.createContext(sandbox);
   vm.runInContext(code, sandbox, { filename: scriptPath });
   return sandbox;
@@ -39,12 +42,16 @@ test('transformCumulativeCharges sorts dates and parses numeric values', () => {
   const transformed = sandbox.transformCumulativeCharges(raw);
   assert.equal(transformed.year, 2026);
   assert.equal(transformed.month, 4);
-  assert.deepEqual(
-    toPlain(transformed.datasets.map((d) => d.label)),
-    ['CPU SU', 'GPU SU']
-  );
-  assert.deepEqual(toPlain(transformed.datasets[0].data), [1.0, 2.25, 3.2]);
-  assert.deepEqual(toPlain(transformed.datasets[1].data), [2.1, 5.0, 8.4]);
+  assert.deepEqual(toPlain(transformed.datasets.map((d) => d.label)), ['CPU SU', 'GPU SU']);
+  const cpuData = toPlain(transformed.datasets[0].data);
+  const gpuData = toPlain(transformed.datasets[1].data);
+  assert.equal(cpuData[0], 1.0);
+  assert.equal(cpuData[1], 2.25);
+  assert.equal(cpuData[2], 3.2);
+  assert.equal(gpuData[0], 2.1);
+  assert.equal(gpuData[1], 5.0);
+  assert.equal(gpuData[2], 8.4);
+  assert.equal(cpuData[3], null);
 });
 
 test('transformCumulativeCharges returns null for empty input', () => {
@@ -82,7 +89,9 @@ test('loadUsageDataFromDOM reads and transforms charges-data payload', () => {
   assert.ok(transformed);
   assert.equal(transformed.year, 2026);
   assert.equal(transformed.month, 4);
-  assert.deepEqual(toPlain(transformed.datasets), [
-    { label: 'CPU', data: [10, 14.5] },
-  ]);
+  assert.equal(transformed.datasets.length, 1);
+  assert.equal(transformed.datasets[0].label, 'CPU');
+  assert.equal(transformed.datasets[0].data[0], 10);
+  assert.equal(transformed.datasets[0].data[1], 14.5);
+  assert.equal(transformed.datasets[0].data[2], null);
 });

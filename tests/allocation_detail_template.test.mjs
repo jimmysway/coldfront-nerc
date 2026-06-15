@@ -19,7 +19,7 @@ test('template includes charges JSON sources', () => {
   // We support both context-based and attribute-based charge payloads
   // so allocation pages still show data across different backend paths.
   assert.ok(template.includes('{{ charges|json_script:"charges-data" }}'));
-  assert.ok(template.includes('Cumulative Daily Charges for Month'));
+  assert.ok(template.includes('usage-table-empty'));
   assert.ok(
     template.includes('<script id="charges-data" type="application/json">')
   );

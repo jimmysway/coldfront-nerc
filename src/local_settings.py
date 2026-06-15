@@ -46,9 +46,9 @@ DATABASES = {
             default='django.db.backends.mysql'
         ),
         'NAME': ENV.get_value('DATABASE_NAME', default='coldfront'),
-        'USER': ENV.get_value('DATABASE_USER'),
-        'PASSWORD': ENV.get_value('DATABASE_PASSWORD'),
-        'HOST': ENV.get_value('DATABASE_HOST'),
+        'USER': ENV.get_value('DATABASE_USER', default=''),
+        'PASSWORD': ENV.get_value('DATABASE_PASSWORD', default=''),
+        'HOST': ENV.get_value('DATABASE_HOST', default=''),
         'PORT': ENV.get_value('DATABASE_PORT', default=3306),
     },
 }

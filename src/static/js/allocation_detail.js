@@ -89,13 +89,16 @@ function transformCumulativeCharges(rawData) {
   const sortedSuTypes = Array.from(suTypes).sort();
 
   sortedSuTypes.forEach((suType) => {
-    const data = sortedDates.map((dateStr) => {
+    const daysInMonth = new Date(year, month + 1, 0).getDate();
+    const data = new Array(daysInMonth).fill(null);
+    for (const dateStr of sortedDates) {
       const dayData = rawData[dateStr];
-      if (dayData && dayData[suType] !== undefined) {
-        return parseFloat(dayData[suType]);
+      if (!dayData || dayData[suType] === undefined) continue;
+      const day = parseInt(dateStr.split('-')[2], 10);
+      if (day >= 1 && day <= daysInMonth) {
+        data[day - 1] = parseFloat(dayData[suType]);
       }
-      return null;
-    });
+    }
     datasets.push({ label: suType, data });
   });
 
@@ -133,25 +136,34 @@ function loadUsageDataFromDOM() {
   return transformed;
 }
 
-const usageChartData = loadUsageDataFromDOM();
-const usageYear = usageChartData?.year ?? new Date().getFullYear();
-const usageMonth =
-  usageChartData?.month !== undefined
-    ? usageChartData.month
-    : new Date().getMonth();
-const usageLabels = generateUsageLabels(usageYear, usageMonth);
+let usageDatasets = [];
+let usageLabels = [];
+let currentDataMode = 'cumulative';
+let dataTableInstance = null;
 
-let usageDatasets =
-  usageChartData && usageChartData.datasets.length > 0
-    ? usageChartData.datasets
-    : [];
+const usageTable = () => document.getElementById('allocationUsageTable');
+const usageEmptyState = () => document.getElementById('usage-table-empty');
+const cumulativeBtn = () => document.getElementById('show-cumulative-btn');
+const dailyBtn = () => document.getElementById('show-daily-btn');
+const chartTitle = () => document.getElementById('chart-title');
+const chartSubtitle = () => document.getElementById('chart-subtitle');
 
-const suCostsCard = document.getElementById('su-costs-card');
-if (suCostsCard && usageDatasets.length === 0) {
-  suCostsCard.style.display = 'none';
+function showUsageEmptyState(message) {
+  const table = usageTable();
+  const empty = usageEmptyState();
+  if (table) table.style.display = 'none';
+  if (empty) {
+    empty.textContent = message;
+    empty.style.display = 'block';
+  }
 }
 
-let currentDataMode = 'cumulative';
+function hideUsageEmptyState() {
+  const table = usageTable();
+  const empty = usageEmptyState();
+  if (table) table.style.display = '';
+  if (empty) empty.style.display = 'none';
+}
 
 function getDataForMode(mode) {
   if (mode === 'daily') {
@@ -163,7 +175,16 @@ function getDataForMode(mode) {
   return usageDatasets;
 }
 
-let dataTableInstance = null;
+const modeConfig = {
+  cumulative: {
+    title: 'SU Cost - Cumulative',
+    subtitle: 'Showing the cumulative cost for this month',
+  },
+  daily: {
+    title: 'SU Cost - Daily',
+    subtitle: 'Showing the daily cost for this month',
+  },
+};
 
 function populateUsageTable(datasets) {
   const table = document.getElementById('allocationUsageTable');
@@ -223,28 +244,14 @@ function populateUsageTable(datasets) {
   }
 }
 
-const cumulativeBtn = document.getElementById('show-cumulative-btn');
-const dailyBtn = document.getElementById('show-daily-btn');
-const chartTitle = document.getElementById('chart-title');
-const chartSubtitle = document.getElementById('chart-subtitle');
-
-const modeConfig = {
-  cumulative: {
-    title: 'SU Cost - Cumulative',
-    subtitle: 'Showing the cumulative cost for this month',
-  },
-  daily: {
-    title: 'SU Cost - Daily',
-    subtitle: 'Showing the daily cost for this month',
-  },
-};
-
 function setModeButtons(mode) {
-  if (!cumulativeBtn || !dailyBtn) return;
-  cumulativeBtn.classList.toggle('btn-primary', mode === 'cumulative');
-  cumulativeBtn.classList.toggle('btn-outline-primary', mode !== 'cumulative');
-  dailyBtn.classList.toggle('btn-primary', mode === 'daily');
-  dailyBtn.classList.toggle('btn-outline-primary', mode !== 'daily');
+  const cumulative = cumulativeBtn();
+  const daily = dailyBtn();
+  if (!cumulative || !daily) return;
+  cumulative.classList.toggle('btn-primary', mode === 'cumulative');
+  cumulative.classList.toggle('btn-outline-primary', mode !== 'cumulative');
+  daily.classList.toggle('btn-primary', mode === 'daily');
+  daily.classList.toggle('btn-outline-primary', mode !== 'daily');
 }
 
 function switchMode(mode) {
@@ -252,15 +259,41 @@ function switchMode(mode) {
   currentDataMode = mode;
   setModeButtons(mode);
   populateUsageTable(getDataForMode(mode));
-  if (chartTitle) chartTitle.textContent = modeConfig[mode].title;
-  if (chartSubtitle) chartSubtitle.textContent = modeConfig[mode].subtitle;
+  const title = chartTitle();
+  const subtitle = chartSubtitle();
+  if (title) title.textContent = modeConfig[mode].title;
+  if (subtitle) subtitle.textContent = modeConfig[mode].subtitle;
 }
 
-if (usageDatasets.length > 0) {
+function initUsageTable() {
+  const usageChartData = loadUsageDataFromDOM();
+  const usageYear = usageChartData?.year ?? new Date().getFullYear();
+  const usageMonth =
+    usageChartData?.month !== undefined
+      ? usageChartData.month
+      : new Date().getMonth();
+  usageLabels = generateUsageLabels(usageYear, usageMonth);
+  usageDatasets =
+    usageChartData && usageChartData.datasets.length > 0
+      ? usageChartData.datasets
+      : [];
+
+  if (usageDatasets.length === 0) {
+    showUsageEmptyState('No billing data available for this month.');
+    return;
+  }
+
+  hideUsageEmptyState();
   setModeButtons('cumulative');
   populateUsageTable(getDataForMode('cumulative'));
-  cumulativeBtn?.addEventListener('click', () => switchMode('cumulative'));
-  dailyBtn?.addEventListener('click', () => switchMode('daily'));
+  cumulativeBtn()?.addEventListener('click', () => switchMode('cumulative'));
+  dailyBtn()?.addEventListener('click', () => switchMode('daily'));
+}
+
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', initUsageTable);
+} else {
+  initUsageTable();
 }
 
 if (typeof window !== 'undefined') {
