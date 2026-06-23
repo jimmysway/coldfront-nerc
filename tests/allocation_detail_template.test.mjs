@@ -6,26 +6,30 @@ import path from 'node:path';
 const templatePath = path.resolve('src/templates/allocation/allocation_detail.html');
 const template = fs.readFileSync(templatePath, 'utf8');
 
-test('costs card and table elements exist', () => {
-  // These IDs are the contract between template and JS; if they change,
-  // users lose the usage table even when data exists.
+test('costs card and toggle elements exist', () => {
   assert.ok(template.includes('id="su-costs-card"'));
-  assert.ok(template.includes('id="allocationUsageTable"'));
+  assert.ok(template.includes('id="cumulative-table-wrap"'));
+  assert.ok(template.includes('id="daily-table-wrap"'));
   assert.ok(template.includes('id="show-cumulative-btn"'));
   assert.ok(template.includes('id="show-daily-btn"'));
 });
 
-test('template includes charges JSON sources', () => {
-  // We support both context-based and attribute-based charge payloads
-  // so allocation pages still show data across different backend paths.
-  assert.ok(template.includes('{{ charges|json_script:"charges-data" }}'));
-  assert.ok(template.includes('usage-table-empty'));
-  assert.ok(
-    template.includes('<script id="charges-data" type="application/json">')
-  );
+test('template renders server-side usage rows from usage_table context', () => {
+  assert.ok(template.includes('{% if usage_table.has_data %}'));
+  assert.ok(template.includes('{% for row in usage_table.cumulative_rows %}'));
+  assert.ok(template.includes('{% for row in usage_table.daily_rows %}'));
+  assert.ok(template.includes('id="usage-cumulative-table"'));
+  assert.ok(template.includes('id="usage-daily-table"'));
+  assert.ok(template.includes('data-order="{{ forloop.counter }}"'));
+  assert.ok(template.includes('No billing data available for this month.'));
 });
 
-test('template loads allocation detail JS asset', () => {
-  // Without this script include, the costs section renders as an empty shell.
+test('template does not embed charges JSON for client-side table building', () => {
+  assert.ok(!template.includes('json_script:"charges-data"'));
+  assert.ok(!template.includes('id="charges-data"'));
+  assert.ok(!template.includes('id="allocationUsageTable"'));
+});
+
+test('template loads allocation detail toggle script', () => {
   assert.ok(template.includes("{% static 'js/allocation_detail.js' %}"));
 });

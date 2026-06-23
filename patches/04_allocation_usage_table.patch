@@ -1,8 +1,8 @@
 diff --git a/coldfront/core/allocation/templates/allocation/allocation_detail.html b/coldfront/core/allocation/templates/allocation/allocation_detail.html
-index 59faa076..e1c496da 100644
+index 369cf81b..3e5a172d 100644
 --- a/coldfront/core/allocation/templates/allocation/allocation_detail.html
 +++ b/coldfront/core/allocation/templates/allocation/allocation_detail.html
-@@ -175,6 +175,49 @@ Allocation Detail
+@@ -173,6 +173,99 @@ Allocation Detail
    </div>
  </div>
  
@@ -28,33 +28,84 @@ index 59faa076..e1c496da 100644
 +        </div>
 +      </div>
 +    </div>
-+    {% if charges %}
-+    {{ charges|json_script:"charges-data" }}
++    {% if usage_table.has_data %}
++      <div id="cumulative-table-wrap" class="table-responsive">
++        <table id="usage-cumulative-table" class="table table-hover">
++          <thead>
++            <tr>
++              <th scope="col">Date</th>
++              {% for su_type in usage_table.su_types %}
++                <th scope="col">{{ su_type }} (USD)</th>
++              {% endfor %}
++              <th scope="col">Total (USD)</th>
++            </tr>
++          </thead>
++          <tbody>
++            {% for row in usage_table.cumulative_rows %}
++              <tr>
++                <th scope="row" class="text-nowrap" data-order="{{ forloop.counter }}">{{ row.label }}</th>
++                {% for value in row.cells %}
++                  {% if value is not None %}
++                    <td>{{ value|floatformat:2 }}</td>
++                  {% else %}
++                    <td class="text-muted">-</td>
++                  {% endif %}
++                {% endfor %}
++                {% if row.total is not None %}
++                  <td><strong>{{ row.total|floatformat:2 }}</strong></td>
++                {% else %}
++                  <td class="text-muted">-</td>
++                {% endif %}
++              </tr>
++            {% endfor %}
++          </tbody>
++        </table>
++      </div>
++      <div id="daily-table-wrap" class="table-responsive" style="display: none;">
++        <table id="usage-daily-table" class="table table-hover">
++          <thead>
++            <tr>
++              <th scope="col">Date</th>
++              {% for su_type in usage_table.su_types %}
++                <th scope="col">{{ su_type }} (USD)</th>
++              {% endfor %}
++              <th scope="col">Total (USD)</th>
++            </tr>
++          </thead>
++          <tbody>
++            {% for row in usage_table.daily_rows %}
++              <tr>
++                <th scope="row" class="text-nowrap" data-order="{{ forloop.counter }}">{{ row.label }}</th>
++                {% for value in row.cells %}
++                  {% if value is not None %}
++                    <td>{{ value|floatformat:2 }}</td>
++                  {% else %}
++                    <td class="text-muted">-</td>
++                  {% endif %}
++                {% endfor %}
++                {% if row.total is not None %}
++                  <td><strong>{{ row.total|floatformat:2 }}</strong></td>
++                {% else %}
++                  <td class="text-muted">-</td>
++                {% endif %}
++              </tr>
++            {% endfor %}
++          </tbody>
++        </table>
++      </div>
 +    {% else %}
-+      {% for attribute in attributes %}
-+        {% if attribute.allocation_attribute_type.name == 'Cumulative Daily Charges for Month' %}
-+          <script id="charges-data" type="application/json">{{ attribute.value|safe }}</script>
-+        {% endif %}
-+      {% endfor %}
++      <p class="text-muted mb-0">No billing data available for this month.</p>
 +    {% endif %}
-+    <p id="usage-table-empty" class="text-muted mb-0" style="display: none;"></p>
-+    <div class="table-responsive">
-+      <table id="allocationUsageTable" class="table table-hover">
-+        <thead>
-+        </thead>
-+        <tbody>
-+        </tbody>
-+      </table>
-+    </div>
 +  </div>
 +</div>
 +
  {% if eulas %}
  <div class="card mb-3">
    <div class="card-header">
-@@ -461,4 +504,5 @@ document.addEventListener('DOMContentLoaded', function() {
-   });
- });
+@@ -470,4 +563,5 @@ Allocation Detail
+     }
+   })
  </script>
-+<script src="{% static 'js/allocation_detail.js' %}?v=2"></script>
++<script src="{% static 'js/allocation_detail.js' %}?v=3"></script>
  {% endblock %}
+\ No newline at end of file

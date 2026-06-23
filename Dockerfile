@@ -25,11 +25,13 @@ RUN pip3 install -r /tmp/requirements.txt
 COPY patches/01_add_api_urls.patch /opt/venv/lib/python3.12/site-packages/
 COPY patches/03_add_active_needs_renewal_status.patch /opt/venv/lib/python3.12/site-packages/
 COPY patches/04_allocation_usage_table.patch /opt/venv/lib/python3.12/site-packages/
+COPY patches/05_allocation_detail_charges.patch /opt/venv/lib/python3.12/site-packages/
 
 RUN cd /opt/venv/lib/python3.12/site-packages && \
     patch -p1 < 01_add_api_urls.patch && \
     patch -p1 < 03_add_active_needs_renewal_status.patch && \
-    patch -p1 < 04_allocation_usage_table.patch
+    patch -p1 < 04_allocation_usage_table.patch && \
+    patch -p1 < 05_allocation_detail_charges.patch
 
 # Final Image
 FROM python:3.12-slim-bullseye

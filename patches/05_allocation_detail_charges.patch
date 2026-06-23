@@ -1,0 +1,20 @@
+diff --git a/coldfront/core/allocation/views.py b/coldfront/core/allocation/views.py
+--- a/coldfront/core/allocation/views.py
++++ b/coldfront/core/allocation/views.py
+@@ -67,7 +67,8 @@
+ from coldfront.core.allocation.utils import generate_guauge_data_from_usage, get_user_resources
+ from coldfront.core.project.models import Project, ProjectPermission, ProjectUser, ProjectUserStatusChoice
+ from coldfront.core.resource.models import Resource
+ from coldfront.core.utils.common import get_domain_url, import_from_settings
++from nerc_allocation.usage_charges import usage_table_for_allocation
+ from coldfront.core.utils.mail import (
+     build_link,
+     send_allocation_admin_email,
+@@ -182,6 +183,7 @@ class AllocationDetailView(LoginRequiredMixin, UserPassesTestMixin, TemplateView
+ 
+         context["notes"] = notes
+         context["ALLOCATION_ENABLE_ALLOCATION_RENEWAL"] = ALLOCATION_ENABLE_ALLOCATION_RENEWAL
++        context["usage_table"] = usage_table_for_allocation(allocation_obj)
+         return context
+ 
+     def get(self, request, *args, **kwargs):
